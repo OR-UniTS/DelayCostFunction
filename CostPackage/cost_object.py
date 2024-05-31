@@ -1,3 +1,6 @@
+from matplotlib import pyplot as plt
+
+
 class CostObject:
     def __init__(self, cost_function, aircraft_type, flight_phase_input,
                  is_low_cost_airline, flight_length, origin_airport, destination_airport, curfew_violated,
@@ -52,6 +55,20 @@ class CostObject:
 
         self.params_dict = self.make_params_dict()
 
+    def plot(self, max_delay: int = 300, file_name: str = None):
+        x = range(max_delay)
+        y = [self.cost_function(x) for x in x]
+        plt.rcParams['figure.figsize'] = 25, 15
+        plt.rcParams['font.size'] = 25
+        plt.xlabel('Delay (min)')
+        plt.ylabel('Cost (€)')
+        plt.plot(x, y)
+        plt.tight_layout()
+        if file_name is not None:
+            plt.savefig(file_name)
+        else:
+            plt.show()
+
     def make_params_dict(self):
         return {
             "cost_function": self.cost_function,
@@ -105,9 +122,6 @@ class CostObject:
 
         return params
 
-        # return (list(self.params_dict.keys())[0] + list(list(self.params_dict.keys())[1].keys())
-        #         + list(list(self.params_dict.keys())[2].keys()))
-
     def info(self):
 
         top_level_keys = list(self.params_dict.keys())
@@ -125,16 +139,3 @@ class CostObject:
             derived_keys = list(self.params_dict[top_level_keys[2]].keys())
             for key in derived_keys:
                 print(key)
-
-        # print((list(self.params_dict.keys())[0]), "\n")
-        #
-        # print("Input parameters")
-        # l = list(list(self.params_dict.keys())[1].keys())
-        # for key in l:
-        #     print(key)
-        #
-        # print("\nDerived parameters")
-        #
-        # l = list(list(self.params_dict.keys())[2].keys())
-        # for key in l:
-        #     print(key)
