@@ -98,9 +98,7 @@ Curfew cost estimations are complicated by varying airport regulations and the d
 
 The design of the software has been significantly influenced by a thorough analysis of two main resources:
 
-1. **Cost Models**: This source code  focuses on quantifying the costs of delays in aviation. The analysis of this model has been crucial in understanding different approaches to estimate delay costs within the aviation industry. [View the Cost Models code on GitHub](https://github.com/andygaspar/CostModels).
-
-2. **Mercury**: An open-source platform developed by the University of Westminster - ATM Research Group serves as a tool for the evaluation of air transport mobility and has been instrumental in providing insights into aviation industry concepts and mechanisms. [View the Mercury project on GitHub](https://github.com/UoW-ATM/Mercury/).
+1. **Mercury**: An open-source platform developed by the University of Westminster - ATM Research Group serves as a tool for the evaluation of air transport mobility and has been instrumental in providing insights into aviation industry concepts and mechanisms. [View the Mercury project on GitHub](https://github.com/UoW-ATM/Mercury/).
 [Read the Mercury article](https://westminsterresearch.westminster.ac.uk/item/w7012/mercury-an-open-source-platform-for-the-evaluation-of-air-transport-mobility).
 
 These resources have been invaluable in shaping the methodologies and functionalities integrated into the developed software, offering a comprehensive understanding of delay costs and aviation dynamics.
