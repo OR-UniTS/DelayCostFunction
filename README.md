@@ -1,6 +1,9 @@
 # DelayCostFunction
 Primary tactical gate-to-gate flight delay cost software simulator
 
+## Installation
+pip install "git+https://github.com/OR-UniTS/DelayCostFunction.git"
+
 ## Reference Documents
 
 In the development of this project, which aims at estimating flight delay costs, three documents have been instrumental in ensuring the consistency, relevance, and comprehensiveness of the integrated cost values. These documents provide valuable insights and data on delay costs within the European aviation sector and have shaped the functionalities included in the project:
