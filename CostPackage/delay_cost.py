@@ -203,9 +203,6 @@ def get_delay_cost(aircraft_type: str,
     except AircraftClusterError as aircraft_cluster_error:
         print(aircraft_cluster_error.message)
 
-    except FlightPhaseError as flight_phase_error:
-        print(flight_phase_error.message)
-
     except AirportCodeError as airport_code_error:
         print(airport_code_error.message)
 
