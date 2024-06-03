@@ -129,7 +129,7 @@ def get_delay_cost(aircraft_type: str, flight_phase_input: str,  # NECESSARY PAR
             # elif destination airport is in group 1 airports (more than 25 million passengers) set scenario to high
             # else scenario default is base
         if is_low_cost_airline is not None or destination_airport is not None:
-            scenario = get_fixed_cost_scenario(is_LCC_airline=is_low_cost_airline,
+            scenario = get_fixed_cost_scenario(is_low_cost_airline=is_low_cost_airline,
                                                destination_airport_ICAO=destination_airport)
             passenger_scenario = scenario if passengers is None or type(passengers) is int else passengers
 

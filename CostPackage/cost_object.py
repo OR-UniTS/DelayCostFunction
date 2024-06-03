@@ -132,10 +132,10 @@ class CostObject:
         if isinstance(self.params_dict[top_level_keys[1]], dict):
             input_keys = list(self.params_dict[top_level_keys[1]].keys())
             for key in input_keys:
-                print(key)
+                print(key + ':', self.params_dict[top_level_keys[1]][key])
 
         print("\nDerived parameters")
         if isinstance(self.params_dict[top_level_keys[2]], dict):
             derived_keys = list(self.params_dict[top_level_keys[2]].keys())
             for key in derived_keys:
-                print(key)
+                print(key + ':',  self.params_dict[top_level_keys[2]][key])
