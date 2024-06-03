@@ -50,11 +50,11 @@ class CostObject:
 
         self.params_dict = self.make_params_dict()
 
-    def plot(self, max_delay: int = 300, file_name: str = None):
+    def plot(self, max_delay: int = 300, file_name: str = None, fig_size: tuple = (25, 15), font_size: int = 25):
         x = range(max_delay)
         y = [self.cost_function(x) for x in x]
-        plt.rcParams['figure.figsize'] = 25, 15
-        plt.rcParams['font.size'] = 25
+        plt.rcParams['figure.figsize'] = fig_size
+        plt.rcParams['font.size'] = font_size
         plt.xlabel('Delay (min)')
         plt.ylabel('Cost (€)')
         plt.plot(x, y)
