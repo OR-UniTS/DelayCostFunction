@@ -46,9 +46,9 @@ def get_interval(delay, costs, delays):
 
 
 def get_hard_costs(passengers: int, scenario: str, haul: str) -> Callable:
-    waiting_passengers = passengers * (WAITING_RATE_LOW_COST if get_scenario(scenario) == "LowScenario"
+    waiting_passengers = passengers * (WAITING_RATE_LOW_COST if scenario == "LowScenario"
                                        else WAITING_RATE)
-    reimbursement_passengers = passengers * (REIMBURSEMENT_RATE_LOW_COST if get_scenario(scenario) == "LowScenario"
+    reimbursement_passengers = passengers * (REIMBURSEMENT_RATE_LOW_COST if scenario == "LowScenario"
                                              else REIMBURSEMENT_RATE)
     passenger_care_support_list = ["care", "reimbursement_rebooking", "compensation", "accommodation"]
     waiting_passenger_costs = 0

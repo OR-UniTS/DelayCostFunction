@@ -27,8 +27,7 @@ def get_interpolated_value(delay, costs, delays):
 
 
 def get_soft_costs(passengers: int, scenario: str) -> Callable:
-    entry_scenario = get_scenario(scenario)
-    costs = df_soft[entry_scenario].to_numpy()
+    costs = df_soft[scenario].to_numpy()
     delays = df_soft.Delay.to_numpy()
     # To calculate the overall soft costs only a 10% of provided soft costs are used
     # this is why the discount_factor is used see page 39/110 of following document

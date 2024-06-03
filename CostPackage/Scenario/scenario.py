@@ -11,12 +11,18 @@ class ScenarioError(Exception):
 
 
 def get_scenario(scenario: str):
-    match scenario.lower():
+    match scenario:
         case 'low':
             entry_scenario = 'LowScenario'
         case 'base':
             entry_scenario = 'BaseScenario'
         case 'high':
+            entry_scenario = 'HighScenario'
+        case 'LowScenario':
+            entry_scenario = 'LowScenario'
+        case 'BaseScenario':
+            entry_scenario = 'BaseScenario'
+        case 'HighScenario':
             entry_scenario = 'HighScenario'
         case _:
             raise ScenarioError(scenario)

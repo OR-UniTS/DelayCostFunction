@@ -9,7 +9,7 @@ def get_delay_cost(aircraft_type: str,
                    crew_costs: float | str = None,
                    maintenance_costs: float | str = None,
                    missed_connection_passengers: List[Tuple] = None,
-                   curfew: tuple[float, int] | int = None
+                   curfew: tuple[float, int] | Union[int, float] = None
                    ) -> CostObject:
     """Generate cost function of delay of a given flight according to the specifics
     Parameters:
@@ -72,7 +72,6 @@ def get_delay_cost(aircraft_type: str,
     passengers_number = 0
     regular_passengers = 0
     aircraft_cluster = None
-    flight_phase = None
     total_crew_costs = zero_costs()
     total_maintenance_costs = zero_costs()
     total_fuel_costs = zero_costs()
@@ -164,7 +163,7 @@ def get_delay_cost(aircraft_type: str,
         # CURFEW COSTS
         if curfew is None:
             curfew_costs = zero_costs()
-        elif type(curfew) is tuple or type(curfew) is float:
+        elif type(curfew) is tuple or type(curfew) in [float, int]:
             curfew_threshold = curfew[0] if type(curfew) is tuple else curfew
             curfew_passengers = curfew[
                 1] if type(curfew) is tuple else regular_passengers + number_missed_connection_passengers

@@ -16,7 +16,7 @@ group_1_airports = pd.read_csv(os.path.join(os.path.dirname(__file__), "airportM
 
 
 def is_valid_airport_icao(airport_icao: str):
-    if airport_icao in df_airports['ICAO'].values:
+    if airport_icao in df_airports[' ICAO'].values:
         return True
     else:
         raise AirportCodeError
@@ -29,7 +29,7 @@ def is_valid_airport_icao(airport_icao: str):
 # https://www.beacon-sesar.eu/wp-content/uploads/2022/10/893100-BEACON-D3.2-Industry-briefing-on-updates-to-the-European-cost-of-delay-V.01.01.00-1.pdf
 def is_group_1_airport(airport_icao: str):
     if is_valid_airport_icao(airport_icao):
-        if airport_icao in group_1_airports.to_list():
+        if airport_icao in group_1_airports.Airport.to_list():
             return True
         else:
             return False
