@@ -1,3 +1,5 @@
+from typing import List
+
 from matplotlib import pyplot as plt
 
 
@@ -52,6 +54,7 @@ class CostObject:
         self.passengers_soft_costs_function = passengers_soft_costs
 
         self.params_dict = self.make_params_dict()
+        self.components_dict = self.make_components_dict()
 
     def plot(self, max_delay: int = 300, file_name: str = None, fig_size: tuple = (25, 15), font_size: int = 25):
         x = range(max_delay)
@@ -61,6 +64,24 @@ class CostObject:
         plt.xlabel('Delay (min)')
         plt.ylabel('Cost (€)')
         plt.plot(x, y)
+        plt.tight_layout()
+        if file_name is not None:
+            plt.savefig(file_name)
+        else:
+            plt.show()
+
+    def plot_components(self, components: List[str] = None, max_delay: int = 300, file_name: str = None,
+                        fig_size: tuple = (25, 15), font_size: int = 25, line_width=4):
+        plt.rcParams['figure.figsize'] = fig_size
+        plt.rcParams['font.size'] = font_size
+        components = components if components is not None else self.components_dict.keys()
+        for component in components:
+            x = range(max_delay)
+            y = [self.components_dict[component](x) for x in x]
+            plt.plot(x, y, label=component, linewidth=line_width)
+        plt.xlabel('Delay (min)')
+        plt.ylabel('Cost (€)')
+        plt.legend()
         plt.tight_layout()
         if file_name is not None:
             plt.savefig(file_name)
@@ -98,6 +119,18 @@ class CostObject:
             }
         }
 
+    def make_components_dict(self):
+        return {
+            "cost_function": self.cost_function,
+            "total_crew_costs_function": self.total_crew_costs_function,
+            "total_maintenance_costs_function": self.total_maintenance_costs_function,
+            "total_fuel_costs_function": self.total_fuel_costs_function,
+            "curfew_costs_function": self.curfew_costs_function,
+            "passengers_hard_costs_function": self.passengers_hard_costs_function,
+            "passengers_soft_costs_function": self.passengers_soft_costs_function
+
+        }
+
     def get_params(self):
 
         key_list = list(self.params_dict.keys())
@@ -132,3 +165,5 @@ class CostObject:
             derived_keys = list(self.params_dict[top_level_keys[2]].keys())
             for key in derived_keys:
                 print(key + ':',  self.params_dict[top_level_keys[2]][key])
+
+
