@@ -70,6 +70,7 @@ def get_delay_cost(aircraft_type: str,
     scenario = "base"
     passenger_scenario = "base"
     passengers_number = 0
+    regular_passengers = 0
     aircraft_cluster = None
     flight_phase = None
     total_crew_costs = zero_costs()
@@ -91,7 +92,7 @@ def get_delay_cost(aircraft_type: str,
     try:
         aircraft_cluster = get_aircraft_cluster(aircraft_type)
 
-        flight_phase = 'AT_GATE' # default parameter, to be used in future development
+        flight_phase = 'AT_GATE'  # default parameter, to be used in future development
 
         # to calculate passengers hard costs, haul determined according to flight length is needed
         # if flight_length is None a default value could be used to have a Medium Haul e.g. flight_length=2000
@@ -128,7 +129,7 @@ def get_delay_cost(aircraft_type: str,
         number_missed_connection_passengers = 0 if missed_connection_passengers is None else len(
             missed_connection_passengers)
 
-        passengers_number = passengers_number - number_missed_connection_passengers
+        regular_passengers = passengers_number - number_missed_connection_passengers
 
         # CREW COSTS
         # NO crew costs input, either manage as zero costs or choose a default scenario
@@ -160,14 +161,13 @@ def get_delay_cost(aircraft_type: str,
         else:
             raise FunctionInputParametersError("MAINTENANCE")
 
-
         # CURFEW COSTS
         if curfew is None:
             curfew_costs = zero_costs()
         elif type(curfew) is tuple or type(curfew) is float:
             curfew_threshold = curfew[0] if type(curfew) is tuple else curfew
             curfew_passengers = curfew[
-                1] if type(curfew) is tuple else passengers_number + number_missed_connection_passengers
+                1] if type(curfew) is tuple else regular_passengers + number_missed_connection_passengers
             curfew_cost_value = get_curfew_costs(aircraft_cluster=aircraft_cluster, curfew_passengers=curfew_passengers)
             curfew_costs = lambda d: curfew_cost_value if d > curfew_threshold else 0
 
@@ -176,8 +176,8 @@ def get_delay_cost(aircraft_type: str,
 
         # PASSENGER COSTS
         # Soft and Hard costs of passengers who didn't lose the connection
-        passengers_hard_costs = get_hard_costs(passengers=passengers_number, scenario=passenger_scenario, haul=haul)
-        passengers_soft_costs = get_soft_costs(passengers=passengers_number, scenario=passenger_scenario)
+        passengers_hard_costs = get_hard_costs(passengers=regular_passengers, scenario=passenger_scenario, haul=haul)
+        passengers_soft_costs = get_soft_costs(passengers=regular_passengers, scenario=passenger_scenario)
 
         # Soft and Hard costs of passengers with missed connection
         if number_missed_connection_passengers > 0:
@@ -239,11 +239,11 @@ def get_delay_cost(aircraft_type: str,
                                        + passengers_costs(delay) + curfew_costs(delay))
 
         cost_object = CostObject(cost_function, aircraft_type,
-                                 is_low_cost_airline, flight_length, destination_airport,
-                                 crew_costs, maintenance_costs, missed_connection_passengers, curfew,
-                                 aircraft_cluster, flight_phase, haul,
-                                 scenario, passenger_scenario, passengers_number, total_crew_costs,
-                                 total_maintenance_costs, curfew_costs,
+                                 is_low_cost_airline, flight_length, destination_airport, crew_costs, maintenance_costs,
+                                 missed_connection_passengers,
+                                 curfew, aircraft_cluster, flight_phase, haul, scenario, passenger_scenario,
+                                 regular_passengers, passengers_number,
+                                 total_crew_costs, total_maintenance_costs, total_fuel_costs, curfew_costs,
                                  passengers_hard_costs, passengers_soft_costs)
 
         return cost_object
