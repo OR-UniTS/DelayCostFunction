@@ -67,8 +67,8 @@ def get_delay_cost(aircraft_type: str,
 
     # DEFAULT
     haul = "MediumHaul"
-    scenario = "base"
-    passenger_scenario = "base"
+    scenario = "BaseScenario"
+    passenger_scenario = "BaseScenario"
     passengers_number = 0
     regular_passengers = 0
     aircraft_cluster = None
