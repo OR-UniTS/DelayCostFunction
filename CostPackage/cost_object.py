@@ -5,7 +5,7 @@ class CostObject:
     def __init__(self, cost_function, aircraft_type,
                  is_low_cost_airline, flight_length, destination_airport, crew_costs, maintenance_costs,
                  missed_connection_passengers,
-                 curfew, aircraft_cluster, haul, scenario, passenger_scenario, passengers_number,
+                 curfew, aircraft_cluster, flight_phase, haul, scenario, passenger_scenario, passengers_number,
                  total_crew_costs, total_maintenance_costs, total_fuel_costs, curfew_costs,
                  passengers_hard_costs, passengers_soft_costs):
         """Object containing the result of the cost function computation
@@ -36,6 +36,7 @@ class CostObject:
         self.missed_connection_passengers = missed_connection_passengers
         self.curfew = curfew
         self.aircraft_cluster = aircraft_cluster
+        self.flight_phase = flight_phase
         self.haul_type = haul
         self.final_cost_scenario = scenario
         self.final_passenger_scenario = passenger_scenario
@@ -76,6 +77,7 @@ class CostObject:
                 "crew_costs": self.crew_costs,
                 "maintenance_costs": self.maintenance_costs,
                 "missed_connection_passengers": self.missed_connection_passengers,
+                "flight_phase": self.flight_phase,
                 "curfew": self.curfew
             },
             "derived_parameters": {
