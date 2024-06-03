@@ -1,0 +1,8 @@
+include CostPackage/Passengers/Hard/*.csv
+include CostPackage/Passengers/Soft/*.csv
+include CostPackage/Cluster/*.csv
+include CostPackage/Maintenance/*.csv
+include CostPackage/Crew/*.csv
+include CostPackage/Aircraft/*.csv
+include CostPackage/Airport/*.csv
+include CostPackage/Curfew/*.csv
