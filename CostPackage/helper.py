@@ -10,15 +10,16 @@ from CostPackage.Scenario.scenario import get_fixed_cost_scenario
 class Helper:
 
     def __init__(self):
-        self.aircraft = pd.read_csv(os.path.join(os.path.dirname(__file__), "Aircraft/AircraftClustering.csv")),
-        self.aircraft_seats = pd.read_csv(os.path.join(os.path.dirname(__file__), "Aircraft/AircraftSeats_2019.csv")),
-        self.airports = pd.read_csv(os.path.join(os.path.dirname(__file__), "Airport/airportMore25M.csv")),
-        self.hard_costs = pd.read_csv(os.path.join(os.path.dirname(__file__), "Passenger/Hard/PassengerTacticalCosts_HARD_2019.csv")),
+        self.aircraft = pd.read_csv(os.path.join(os.path.dirname(__file__), "Aircraft/AircraftClustering.csv"))
+        self.aircraft_clusters = self.aircraft.AssignedAircraftType.unique()
+        self.aircraft_seats = pd.read_csv(os.path.join(os.path.dirname(__file__), "Aircraft/AircraftSeats_2019.csv"))
+        self.airports = pd.read_csv(os.path.join(os.path.dirname(__file__), "Airport/airportMore25M.csv"))
+        self.hard_costs = pd.read_csv(os.path.join(os.path.dirname(__file__), "Passenger/Hard/PassengerTacticalCosts_HARD_2019.csv"))
         self.hard_reimbursement_pax = pd.read_csv(os.path.join(os.path.dirname(__file__), "Passenger/Hard"
-                                                                                          "/PassengerReimbursementRates_2019.csv")),
-        self.hard_waiting_pax = pd.read_csv(os.path.join(os.path.dirname(__file__), "Passenger/Hard/PassengerWaitingRates_2019.csv")),
-        self.soft = pd.read_csv(os.path.join(os.path.dirname(__file__), "Passenger/Soft/PassengerTacticalCosts_SOFT_2019.csv")),
-        self.crew = pd.read_csv(os.path.join(os.path.dirname(__file__), "Crew/CrewTacticalCosts_2019.csv")),
+                                                                                          "/PassengerReimbursementRates_2019.csv"))
+        self.hard_waiting_pax = pd.read_csv(os.path.join(os.path.dirname(__file__), "Passenger/Hard/PassengerWaitingRates_2019.csv"))
+        self.soft = pd.read_csv(os.path.join(os.path.dirname(__file__), "Passenger/Soft/PassengerTacticalCosts_SOFT_2019.csv"))
+        self.crew = pd.read_csv(os.path.join(os.path.dirname(__file__), "Crew/CrewTacticalCosts_2019.csv"))
         self.maintenance = pd.read_csv(os.path.join(os.path.dirname(__file__), "Maintenance/MaintenanceTacticalCosts_AT_GATE_2019.csv"))
 
     def get_data_dict(self):
