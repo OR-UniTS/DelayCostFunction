@@ -5,7 +5,7 @@ from typing import Callable, List, Tuple, Union
 from CostPackage.Aircraft.aircraft_cluster import get_aircraft_cluster, AircraftClusterError
 from CostPackage.Airport.airport import is_valid_airport_icao, AirportCodeError
 from CostPackage.Crew.crew_costs import get_crew_costs_from_exact_value, get_crew_costs, InvalidCrewCostsValueError
-from CostPackage.Curfew.curfew_costs import get_curfew_costs_from_exact_value, get_curfew_costs, \
+from CostPackage.Curfew.curfew_costs import  get_curfew_costs, \
     InvalidCurfewCostsValueError
 from CostPackage.FlightPhase.flight_phase import get_flight_phase, FlightPhaseError
 from CostPackage.Fuel.fuel_costs import get_fuel_costs_from_exact_value, InvalidFuelCostsValueError

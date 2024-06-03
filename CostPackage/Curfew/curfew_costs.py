@@ -4,7 +4,7 @@ import pandas as pd
 
 
 # Crew costs in EUR provided directly by user without scenario
-def get_curfew_costs_from_exact_value(curfew_costs_exact_value: float) -> float:
+def check_valid_curfew_costs(curfew_costs_exact_value: float) -> float:
     if curfew_costs_exact_value < 0:
         raise InvalidCurfewCostsValueError(curfew_costs_exact_value)
     return curfew_costs_exact_value
@@ -26,7 +26,7 @@ df_curfew = pd.read_csv(os.path.join(os.path.dirname(__file__), "curfew.csv"))
 # to improve
 # --------------------------------------------------------------------------------------------------
 
-def get_curfew_costs(aircraft_cluster: str, curfew_passengers: int, scenario: str = None) -> float:
+def get_curfew_costs(aircraft_cluster: str, curfew_passengers: int) -> float:
     return curfew_passengers * 300 + df_curfew[df_curfew.AirCluster == aircraft_cluster].Cost.iloc[0]
 
 

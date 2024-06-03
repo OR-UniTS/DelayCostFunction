@@ -11,7 +11,7 @@ df_seats = pd.read_csv(os.path.join(os.path.dirname(__file__), "../Aircraft/Airc
 def get_passengers(aircraft_type: str, scenario: str = None, load_factor: float = None) -> int:
     entry_scenario = get_scenario(scenario)
     aircraft_cluster = get_aircraft_cluster(aircraft_type)
-    seats = df_seats[(df_seats.Aircraft == aircraft_cluster)][entry_scenario].iloc[0]
+    seats = df_seats[(df_seats.AircraftType == aircraft_cluster)][entry_scenario].iloc[0]
     if load_factor is not None:
         if 0 <= load_factor <= 1:
             return round(seats * load_factor)

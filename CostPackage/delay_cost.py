@@ -1,24 +1,20 @@
+from CostPackage.Curfew.curfew_costs import check_valid_curfew_costs
 from CostPackage.TacticalDelayCosts import *
 from CostPackage.cost_object import CostObject
 
 
-def get_delay_cost(aircraft_type: str, flight_phase_input: str,  # NECESSARY PARAMETERS
+def get_delay_cost(aircraft_type: str,
                    passengers: int | str = None,
-                   is_low_cost_airline: bool = None, flight_length: float = None,
-                   origin_airport: str = None, destination_airport: str = None,
-                   curfew_violated: bool = False, curfew_costs_exact_value: float = None,
+                   is_low_cost_airline: bool = None, flight_length: float = None, destination_airport: str = None,
                    crew_costs: float | str = None,
                    maintenance_costs: float | str = None,
-                   fuel_costs: float | str = None,
                    missed_connection_passengers: List[Tuple] = None,
-                   curfew: tuple[float, int] | float = None
+                   curfew: tuple[float, int] | int = None
                    ) -> CostObject:
     """Generate cost function of delay of a given flight according to the specifics
     Parameters:
         aircraft_type: str
             aircraft(ICAO code)
-        flight_phase_input: str
-            can be AT_GATE, TAXI or EN_ROUTE
         passengers: int | str = None
             int is provided means passengers number,
             actual number of passengers boarded on the aircraft,
@@ -34,14 +30,8 @@ def get_delay_cost(aircraft_type: str, flight_phase_input: str,  # NECESSARY PAR
         flight_length: float=None
             Length of flight in kilometers to calculate the type of haul
             (actual fuel costs can be calculated only if provided)
-        origin_airport: str=None
-            ICAO code of airport of departure
         destination_airport: str=None
             ICAO code of airport of arrival
-        curfew_violated: bool=None
-            boolean value true if curfew has been violated
-        curfew_costs_exact_value: float=None
-            total cost of curfew violation in EUR
         crew_costs: float | str =None
             float value means costs of entire crew (pilots and cabin crew) in EUR/min
             str value represents the crew costs scenario which can be either "low", "base" or "high"
@@ -57,12 +47,6 @@ def get_delay_cost(aircraft_type: str, flight_phase_input: str,  # NECESSARY PAR
             "base"
             "base" is the normal scenario (most common)
             "high" is the expensive scenario (e.g. old aircraft or expensive tactical maintenance)
-        fuel_costs: float | str = None
-            costs expressed in EUR/min provided directly
-            (ATTENTION: fuel_costs may be very different at the various flight phases and depending on fuel prices,
-            and the way fuel has been bought e.g. hedging, on spot and other paying schemas)
-            str value represents the fuel costs scenario which can be either "low", "base" or "high"
-            FUEL COSTS CURRENTLY UNAVAILABLE FOR CALCULATION
         missed_connection_passengers: List[Tuple] = None
              list of tuples. Each tuple represents one passenger,
              its composition is (delay threshold, delay perceived).
@@ -107,7 +91,7 @@ def get_delay_cost(aircraft_type: str, flight_phase_input: str,  # NECESSARY PAR
     try:
         aircraft_cluster = get_aircraft_cluster(aircraft_type)
 
-        flight_phase = get_flight_phase(flight_phase_input.strip().upper())
+        flight_phase = 'AT_GATE' # default parameter, to be used in future development
 
         # to calculate passengers hard costs, haul determined according to flight length is needed
         # if flight_length is None a default value could be used to have a Medium Haul e.g. flight_length=2000
@@ -117,9 +101,6 @@ def get_delay_cost(aircraft_type: str, flight_phase_input: str,  # NECESSARY PAR
 
         if flight_length is not None:
             haul = get_haul(flight_length)
-
-        if (origin_airport is not None) and (is_valid_airport_icao(airport_icao=origin_airport.strip().upper())):
-            origin_airport = origin_airport
 
         if (destination_airport is not None) and (
                 is_valid_airport_icao(airport_icao=destination_airport.strip().upper())):
@@ -135,15 +116,19 @@ def get_delay_cost(aircraft_type: str, flight_phase_input: str,  # NECESSARY PAR
 
         # without passengers number input inserted use passengers load factor based on scenario either inserted by user
         # or indirectly obtained by previous if statement
-        if passengers is not None and type(passengers) is str:
-            passenger_scenario = passengers
+        if passengers is None:
+            if type(passengers) is str:
+                passenger_scenario = passengers
+            else:
+                passenger_scenario = scenario
             passengers_number = get_passengers(aircraft_type=aircraft_cluster, scenario=passenger_scenario)
+        else:
+            passengers_number = passengers
 
         number_missed_connection_passengers = 0 if missed_connection_passengers is None else len(
             missed_connection_passengers)
 
-        if passengers is not None and type(passengers) is int:
-            passengers_number = passengers_number - number_missed_connection_passengers
+        passengers_number = passengers_number - number_missed_connection_passengers
 
         # CREW COSTS
         # NO crew costs input, either manage as zero costs or choose a default scenario
@@ -175,36 +160,17 @@ def get_delay_cost(aircraft_type: str, flight_phase_input: str,  # NECESSARY PAR
         else:
             raise FunctionInputParametersError("MAINTENANCE")
 
-        # FUEL COSTS
-        # No fuel costs input,  either manage as zero costs or choose a default scenario
-        if fuel_costs is None:
-            total_fuel_costs = zero_costs()
-            # total_fuel_costs = get_fuel_costs(aircraft_cluster=aircraft_cluster, scenario=scenario,
-            # flight_phase=flight_phase)
-        # Fuel costs based on exact value
-        elif type(fuel_costs) is float:
-            total_fuel_costs = get_fuel_costs_from_exact_value(fuel_costs)
-        # Fuel costs based on scenario
-        # elif type(fuel_costs) is str:
-        #     total_fuel_costs = get_fuel_costs(aircraft_cluster=aircraft_cluster,
-        #                                 scenario=fuel_costs, flight_phase=flight_phase)
-        else:
-            raise FunctionInputParametersError("FUEL")
 
         # CURFEW COSTS
-        # Curfew not violated and no curfew costs provided
-        if curfew_violated is False and curfew_costs_exact_value is None:
+        if curfew is None:
             curfew_costs = zero_costs()
-        # Curfew costs base on exact value
-        elif curfew_costs_exact_value is not None and curfew_violated is True:
-            curfew_costs = get_curfew_costs_from_exact_value(curfew_costs_exact_value)
-        elif curfew_violated is True and curfew is None:
-            curfew_costs = zero_costs()
-        elif curfew_violated is True and curfew is not None:
-            curfew_threshold = curfew[0] if curfew is tuple else curfew
+        elif type(curfew) is tuple or type(curfew) is float:
+            curfew_threshold = curfew[0] if type(curfew) is tuple else curfew
             curfew_passengers = curfew[
-                1] if curfew is tuple else passengers_number + number_missed_connection_passengers
-            curfew_costs = get_curfew_costs(aircraft_cluster=aircraft_cluster, curfew_passengers=curfew_passengers)
+                1] if type(curfew) is tuple else passengers_number + number_missed_connection_passengers
+            curfew_cost_value = get_curfew_costs(aircraft_cluster=aircraft_cluster, curfew_passengers=curfew_passengers)
+            curfew_costs = lambda d: curfew_cost_value if d > curfew_threshold else 0
+
         else:  # Both parameters are not None, situation managed as a conflict
             raise FunctionInputParametersError("CURFEW")
 
@@ -259,9 +225,6 @@ def get_delay_cost(aircraft_type: str, flight_phase_input: str,  # NECESSARY PAR
     except InvalidMaintenanceCostsValueError as invalid_maintenance_costs_value_error:
         print(invalid_maintenance_costs_value_error.message)
 
-    except InvalidFuelCostsValueError as invalid_fuel_costs_value_error:
-        print(invalid_fuel_costs_value_error.message)
-
     except InvalidCurfewCostsValueError as invalid_curfew_costs_value_error:
         print(invalid_curfew_costs_value_error.message)
 
@@ -275,13 +238,12 @@ def get_delay_cost(aircraft_type: str, flight_phase_input: str,  # NECESSARY PAR
         cost_function = lambda delay: (total_maintenance_costs(delay) + total_crew_costs(delay)
                                        + passengers_costs(delay) + curfew_costs(delay))
 
-        cost_object = CostObject(cost_function, aircraft_type, flight_phase_input,
-                                 is_low_cost_airline, flight_length, origin_airport, destination_airport,
-                                 curfew_violated, curfew_costs_exact_value,
-                                 crew_costs, maintenance_costs, fuel_costs, missed_connection_passengers, curfew,
+        cost_object = CostObject(cost_function, aircraft_type,
+                                 is_low_cost_airline, flight_length, destination_airport,
+                                 crew_costs, maintenance_costs, missed_connection_passengers, curfew,
                                  aircraft_cluster, flight_phase, haul,
                                  scenario, passenger_scenario, passengers_number, total_crew_costs,
-                                 total_maintenance_costs, total_fuel_costs, curfew_costs,
+                                 total_maintenance_costs, curfew_costs,
                                  passengers_hard_costs, passengers_soft_costs)
 
         return cost_object
