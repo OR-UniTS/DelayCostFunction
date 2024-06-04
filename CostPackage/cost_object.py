@@ -98,7 +98,6 @@ class CostObject:
 
     def make_params_dict(self):
         return {
-            "cost_function": self.cost_function,
             "input_parameters": {
                 "aircraft_type": self.aircraft_type,
                 "passengers_number": self.passengers_number,
@@ -118,6 +117,10 @@ class CostObject:
                 "final_cost_scenario": self.final_cost_scenario,
                 "final_passenger_scenario": self.passenger_scenario,
                 "regular_passengers": self.regular_passengers,
+
+            },
+            "cost_functions": {
+                "cost_function": self.cost_function,
                 "crew_costs_function": self.crew_costs_function,
                 "maintenance_costs_function": self.maintenance_costs_function,
                 "fuel_costs_function": self.fuel_costs_function,
@@ -160,15 +163,20 @@ class CostObject:
 
         top_level_keys = list(self.params_dict.keys())
 
-        print(top_level_keys[0], "\n")
         print("Input parameters")
 
-        if isinstance(self.params_dict[top_level_keys[1]], dict):
-            input_keys = list(self.params_dict[top_level_keys[1]].keys())
+        if isinstance(self.params_dict[top_level_keys[0]], dict):
+            input_keys = list(self.params_dict[top_level_keys[0]].keys())
             for key in input_keys:
-                print(key + ':', self.params_dict[top_level_keys[1]][key])
+                print(key + ':', self.params_dict[top_level_keys[0]][key])
 
         print("\nDerived parameters")
+        if isinstance(self.params_dict[top_level_keys[1]], dict):
+            derived_keys = list(self.params_dict[top_level_keys[1]].keys())
+            for key in derived_keys:
+                print(key + ':',  self.params_dict[top_level_keys[1]][key])
+
+        print("\nCost function and component functions")
         if isinstance(self.params_dict[top_level_keys[2]], dict):
             derived_keys = list(self.params_dict[top_level_keys[2]].keys())
             for key in derived_keys:
