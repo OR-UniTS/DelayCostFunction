@@ -24,6 +24,17 @@ class Helper:
 
     """Object containing all info about the data used in the get_delay_cost function. 
         It can be used to correctly formulate the input for the function
+        
+        aircraft: dataframe containing all aircraft information and their cluster
+        aircraft_clusters: array containing all aircraft clusters
+        aircraft_seats: aircraft seats dataframe (only clusters)
+        airports: dataframe containing all airports considered in the package
+        hard_costs: dataframe containing all hard cost considered in the package
+        hard_reimbursement_pax: dataframe containing pax reimbursement statistics
+        hard_waiting_pax: dataframe containing pax waiting statistics
+        soft: dataframe containing soft cost considered in the package
+        crew: dataframe containing crew cost considered in the package
+        maintenance: dataframe containing maintenance statistics
 
          get_data_dict(): -> dict
             method to get the dictionary of all dataframes
