@@ -25,6 +25,14 @@ class CostObject:
 
         info():
             methods that prints all parameters of the cost object
+
+        plot(max_delay: int = 300, file_name: str = None, fig_size: tuple = (25, 15), font_size: int = 25)
+            methods that plots the cost function from delay=0 to delay=max_delay
+
+        plot_components(components: List[str]= all components, plot args)
+            method that plots together the components in input list.
+            If no input list is given all components are considered.
+            Remaining inputs are the same of method plot
         """
 
         self.cost_function = cost_function

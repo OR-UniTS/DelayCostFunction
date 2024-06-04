@@ -22,6 +22,18 @@ class Helper:
         self.crew = pd.read_csv(os.path.join(os.path.dirname(__file__), "Crew/CrewTacticalCosts_2019.csv"))
         self.maintenance = pd.read_csv(os.path.join(os.path.dirname(__file__), "Maintenance/MaintenanceTacticalCosts_AT_GATE_2019.csv"))
 
+    """Object containing all info about the data used in the get_delay_cost function. 
+        It can be used to correctly formulate the input for the function
+
+         get_data_dict(): -> dict
+            method to get the dictionary of all dataframes
+        
+        get_pax_number(is_low_cost: bool, destination: str, aircraft_type: str)  -> int
+            method that given the input case return a inferred number of passengers
+            
+        get_pax_number_from_load_factor(aircraft_type: str, load_factor: float)  -> int
+            method that given the input case return a inferred number of passengers
+    """
     def get_data_dict(self):
         data_dict = {
             "aircraft": self.aircraft,
@@ -38,9 +50,10 @@ class Helper:
         return data_dict
 
     @staticmethod
-    def get_pax_number(is_low_cost: bool, destination: str, aircraft_type: str):
+    def get_pax_number(is_low_cost: bool, destination_airport: str, aircraft_type: str):
         aircraft_cluster = get_aircraft_cluster(aircraft_type=aircraft_type)
-        cost_scenario = get_fixed_cost_scenario(is_low_cost_airline=is_low_cost, destination_airport_ICAO=destination)
+        cost_scenario = get_fixed_cost_scenario(is_low_cost_airline=is_low_cost,
+                                                destination_airport_ICAO=destination_airport)
         return get_passengers(aircraft_cluster, cost_scenario)
 
     @staticmethod
