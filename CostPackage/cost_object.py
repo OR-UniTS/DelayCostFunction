@@ -10,7 +10,7 @@ class CostObject:
                  curfew, aircraft_cluster, flight_phase, haul, scenario, passenger_scenario,
                  regular_passengers,
                  passengers_number,
-                 total_crew_costs, total_maintenance_costs, total_fuel_costs, curfew_costs,
+                 crew_cost_function, maintenance_cost_function, fuel_costs, curfew_costs,
                  passengers_hard_costs, passengers_soft_costs):
         """Object containing the result of the cost function computation
 
@@ -46,9 +46,9 @@ class CostObject:
         self.final_cost_scenario = scenario
         self.final_passenger_scenario = passenger_scenario
         self.adjusted_passengers_number = passengers_number
-        self.total_crew_costs_function = total_crew_costs
-        self.total_maintenance_costs_function = total_maintenance_costs
-        self.total_fuel_costs_function = total_fuel_costs
+        self.crew_costs_function = crew_cost_function
+        self.maintenance_costs_function = maintenance_cost_function
+        self.fuel_costs_function = fuel_costs
         self.curfew_costs_function = curfew_costs
         self.passengers_hard_costs_function = passengers_hard_costs
         self.passengers_soft_costs_function = passengers_soft_costs
@@ -91,7 +91,7 @@ class CostObject:
     def make_params_dict(self):
         return {
             "cost_function": self.cost_function,
-            "parameters": {
+            "input_parameters": {
                 "aircraft_type": self.aircraft_type,
                 "passengers_number": self.passengers_number,
                 "passenger_scenario": self.passenger_scenario,
@@ -110,9 +110,9 @@ class CostObject:
                 "final_cost_scenario": self.final_cost_scenario,
                 "final_passenger_scenario": self.passenger_scenario,
                 "regular_passengers": self.regular_passengers,
-                "total_crew_costs_function": self.total_crew_costs_function,
-                "total_maintenance_costs_function": self.total_maintenance_costs_function,
-                "total_fuel_costs_function": self.total_fuel_costs_function,
+                "crew_costs_function": self.crew_costs_function,
+                "maintenance_costs_function": self.maintenance_costs_function,
+                "fuel_costs_function": self.fuel_costs_function,
                 "curfew_costs_function": self.curfew_costs_function,
                 "passengers_hard_costs_function": self.passengers_hard_costs_function,
                 "passengers_soft_costs_function": self.passengers_soft_costs_function
@@ -122,9 +122,9 @@ class CostObject:
     def make_components_dict(self):
         return {
             "cost_function": self.cost_function,
-            "total_crew_costs_function": self.total_crew_costs_function,
-            "total_maintenance_costs_function": self.total_maintenance_costs_function,
-            "total_fuel_costs_function": self.total_fuel_costs_function,
+            "crew_costs_function": self.crew_costs_function,
+            "maintenance_costs_function": self.maintenance_costs_function,
+            "fuel_costs_function": self.fuel_costs_function,
             "curfew_costs_function": self.curfew_costs_function,
             "passengers_hard_costs_function": self.passengers_hard_costs_function,
             "passengers_soft_costs_function": self.passengers_soft_costs_function

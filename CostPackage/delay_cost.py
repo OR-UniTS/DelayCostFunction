@@ -72,12 +72,14 @@ def get_delay_cost(aircraft_type: str,
     passengers_number = 0
     regular_passengers = 0
     aircraft_cluster = None
-    total_crew_costs = zero_costs()
-    total_maintenance_costs = zero_costs()
+    crew_costs_function = zero_costs()
+    maintenance_cost_fucntion = zero_costs()
     total_fuel_costs = zero_costs()
     curfew_costs = zero_costs()
     passengers_hard_costs = zero_costs()
     passengers_soft_costs = zero_costs()
+
+    flight_phase = 'AT_GATE'  # default parameter, to be used in future development
 
     class FunctionInputParametersError(Exception):
         def __init__(self, conflict_type: str):
@@ -90,8 +92,6 @@ def get_delay_cost(aircraft_type: str,
 
     try:
         aircraft_cluster = get_aircraft_cluster(aircraft_type)
-
-        flight_phase = 'AT_GATE'  # default parameter, to be used in future development
 
         # to calculate passengers hard costs, haul determined according to flight length is needed
         # if flight_length is None a default value could be used to have a Medium Haul e.g. flight_length=2000
@@ -133,29 +133,29 @@ def get_delay_cost(aircraft_type: str,
         # CREW COSTS
         # NO crew costs input, either manage as zero costs or choose a default scenario
         if crew_costs is None:
-            # total_crew_costs = zero_costs()
-            total_crew_costs = get_crew_costs(aircraft_cluster=aircraft_cluster, scenario=scenario)
+            # crew_costs_function = zero_costs()
+            crew_costs_function = get_crew_costs(aircraft_cluster=aircraft_cluster, scenario=scenario)
         # Crew costs based on exact value
         elif type(crew_costs) is float:
-            total_crew_costs = get_crew_costs_from_exact_value(crew_costs)
+            crew_costs_function = get_crew_costs_from_exact_value(crew_costs)
         # Crew cost estimation based on scenario
         elif type(crew_costs) is str:
-            total_crew_costs = get_crew_costs(aircraft_cluster=aircraft_cluster, scenario=crew_costs)
+            crew_costs_function = get_crew_costs(aircraft_cluster=aircraft_cluster, scenario=crew_costs)
         else:
             raise FunctionInputParametersError("CREW")
 
         # MAINTENANCE COSTS
         # NO maintenance costs input,  either manage as zero costs or choose a default scenario
         if maintenance_costs is None:
-            # total_maintenance_costs = zero_costs()
-            total_maintenance_costs = get_maintenance_costs(aircraft_cluster=aircraft_cluster,
+            # maintenance_cost_fucntion = zero_costs()
+            maintenance_cost_fucntion = get_maintenance_costs(aircraft_cluster=aircraft_cluster,
                                                             scenario=scenario, flight_phase=flight_phase)
         # Maintenance costs based on exact value
         elif type(maintenance_costs) is float:
-            total_maintenance_costs = get_maintenance_costs_from_exact_value(maintenance_costs)
+            maintenance_cost_fucntion = get_maintenance_costs_from_exact_value(maintenance_costs)
         # Maintenance costs based on scenario
         elif type(maintenance_costs) is str:
-            total_maintenance_costs = get_maintenance_costs(aircraft_cluster=aircraft_cluster,
+            maintenance_cost_fucntion = get_maintenance_costs(aircraft_cluster=aircraft_cluster,
                                                             scenario=maintenance_costs, flight_phase=flight_phase)
         else:
             raise FunctionInputParametersError("MAINTENANCE")
@@ -231,7 +231,7 @@ def get_delay_cost(aircraft_type: str,
         print(print(f"An unexpected exception occurred: {e}"))
 
     finally:
-        cost_function = lambda delay: (total_maintenance_costs(delay) + total_crew_costs(delay)
+        cost_function = lambda delay: (maintenance_cost_fucntion(delay) + crew_costs_function(delay)
                                        + passengers_costs(delay) + curfew_costs(delay))
 
         cost_object = CostObject(cost_function, aircraft_type,
@@ -239,7 +239,7 @@ def get_delay_cost(aircraft_type: str,
                                  missed_connection_passengers,
                                  curfew, aircraft_cluster, flight_phase, haul, scenario, passenger_scenario,
                                  regular_passengers, passengers_number,
-                                 total_crew_costs, total_maintenance_costs, total_fuel_costs, curfew_costs,
+                                 crew_costs_function, maintenance_cost_fucntion, total_fuel_costs, curfew_costs,
                                  passengers_hard_costs, passengers_soft_costs)
 
         return cost_object
