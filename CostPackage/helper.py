@@ -70,6 +70,6 @@ class Helper:
     @staticmethod
     def get_pax_number_from_load_factor(aircraft_type: str, load_factor: float):
         aircraft_cluster = get_aircraft_cluster(aircraft_type=aircraft_type)
-        df_aircraft_seats = pd.read_csv(os.path.join(os.path.dirname(__file__), "Passengers/2019-AircraftSeats.csv"))
+        df_aircraft_seats = pd.read_csv(os.path.join(os.path.dirname(__file__), "Passengers/AircraftSeats_2019.csv"))
         n_passengers = int(load_factor * df_aircraft_seats[df_aircraft_seats.Aircraft == aircraft_cluster].SeatsLow.iloc[0])
         return n_passengers
