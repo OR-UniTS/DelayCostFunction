@@ -4,6 +4,28 @@ from matplotlib import pyplot as plt
 
 
 class CostObject:
+    """Object containing the result of the cost function computation
+
+    cost_function: lambda
+        the lambda function which take as input the delay and returns the cost
+
+    params_dict: dict
+        the dictionary containing all parameters of the cost object
+
+    get_params() ->list(str):
+        methods which return all parameters included in the cost object
+
+    info():
+        methods that prints all parameters of the cost object
+
+    plot(max_delay: int = 300, file_name: str = None, fig_size: tuple = (25, 15), font_size: int = 25)
+        methods that plots the cost function from delay=0 to delay=max_delay
+
+    plot_components(components: List[str]= all components, plot args)
+        method that plots together the components in input list.
+        If no input list is given all components are considered.
+        Remaining inputs are the same of method plot
+    """
     def __init__(self, cost_function, aircraft_type,
                  is_low_cost_airline, flight_length, destination_airport, crew_costs, maintenance_costs,
                  missed_connection_passengers,
@@ -12,28 +34,7 @@ class CostObject:
                  passengers_number,
                  crew_cost_function, maintenance_cost_function, fuel_costs, curfew_costs,
                  passengers_hard_costs, passengers_soft_costs):
-        """Object containing the result of the cost function computation
 
-        cost_function: lambda
-            the lambda function which take as input the delay and returns the cost
-
-        params_dict: dict
-            the dictionary containing all parameters of the cost object
-
-        get_params() ->list(str):
-            methods which return all parameters included in the cost object
-
-        info():
-            methods that prints all parameters of the cost object
-
-        plot(max_delay: int = 300, file_name: str = None, fig_size: tuple = (25, 15), font_size: int = 25)
-            methods that plots the cost function from delay=0 to delay=max_delay
-
-        plot_components(components: List[str]= all components, plot args)
-            method that plots together the components in input list.
-            If no input list is given all components are considered.
-            Remaining inputs are the same of method plot
-        """
 
         self.cost_function = cost_function
 
@@ -71,10 +72,13 @@ class CostObject:
         plt.rcParams['font.size'] = font_size
         plt.xlabel('Delay (min)')
         plt.ylabel('Cost (€)')
-        plt.plot(x, y)
         plt.tight_layout()
+        plt.plot(x, y)
         if file_name is not None:
             plt.savefig(file_name)
+            plt.clf()
+            plt.cla()
+            plt.close()
         else:
             plt.show()
 
@@ -93,6 +97,9 @@ class CostObject:
         plt.tight_layout()
         if file_name is not None:
             plt.savefig(file_name)
+            plt.clf()
+            plt.cla()
+            plt.close()
         else:
             plt.show()
 

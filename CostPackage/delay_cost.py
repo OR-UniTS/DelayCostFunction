@@ -5,7 +5,9 @@ from CostPackage.cost_object import CostObject
 
 def get_delay_cost(aircraft_type: str,
                    passengers: int | str = None,
-                   is_low_cost_airline: bool = None, flight_length: float = None, destination_airport: str = None,
+                   is_low_cost_airline: bool = None,
+                   flight_length: float = None,
+                   destination_airport: str = None,
                    crew_costs: float | str = None,
                    maintenance_costs: float | str = None,
                    missed_connection_passengers: List[Tuple] = None,
@@ -69,7 +71,6 @@ def get_delay_cost(aircraft_type: str,
     haul = "MediumHaul"
     scenario = "BaseScenario"
     passenger_scenario = "BaseScenario"
-    passengers_number = 0
     regular_passengers = 0
     aircraft_cluster = None
     crew_costs_function = zero_costs()
