@@ -4,6 +4,10 @@ Primary tactical gate-to-gate flight delay cost software simulator
 ## Installation
 pip install "git+https://github.com/OR-UniTS/DelayCostFunction.git"
 
+## Colab tutorial
+
+https://colab.research.google.com/drive/1cWlyjDZNZILoqCjIDhkI6wAIM_Su4JWe
+
 ## Reference Documents
 
 In the development of this project, which aims at estimating flight delay costs, three documents have been instrumental in ensuring the consistency, relevance, and comprehensiveness of the integrated cost values. These documents provide valuable insights and data on delay costs within the European aviation sector and have shaped the functionalities included in the project:
@@ -110,5 +114,7 @@ These resources have been invaluable in shaping the methodologies and functional
 Data from the Mercury project was used \
 [most up-to-date dataset Mercury](https://zenodo.org/records/10246302) \
 [dataset Mercury V3](https://zenodo.org/records/10222526) 
+
+
 
 
