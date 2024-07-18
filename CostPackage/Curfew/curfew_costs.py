@@ -11,6 +11,7 @@ def check_valid_curfew_costs(curfew_costs_exact_value: float) -> float:
 
 
 df_curfew = pd.read_csv(os.path.join(os.path.dirname(__file__), "curfew.csv"))
+dict_curfew = df_curfew.set_index('AirCluster')['Cost'].to_dict()
 
 
 # -------------------------------------------------------------------------------------------------
@@ -27,7 +28,7 @@ df_curfew = pd.read_csv(os.path.join(os.path.dirname(__file__), "curfew.csv"))
 # --------------------------------------------------------------------------------------------------
 
 def get_curfew_costs(aircraft_cluster: str, curfew_passengers: int) -> float:
-    return curfew_passengers * 300 + df_curfew[df_curfew.AirCluster == aircraft_cluster].Cost.iloc[0]
+    return curfew_passengers * 300 + dict_curfew[aircraft_cluster]
 
 
 class InvalidCurfewCostsValueError(Exception):

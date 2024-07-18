@@ -10,23 +10,19 @@ class ScenarioError(Exception):
         return "Scenario " + self.scenario + " not found"
 
 
+dict_scenario = {'low': 'LowScenario',
+'base': 'BaseScenario',
+'high': 'HighScenario',
+'LowScenario': 'LowScenario',
+'BaseScenario': 'BaseScenario',
+'HighScenario': 'HighScenario'}
+
+
 def get_scenario(scenario: str):
-    match scenario:
-        case 'low':
-            entry_scenario = 'LowScenario'
-        case 'base':
-            entry_scenario = 'BaseScenario'
-        case 'high':
-            entry_scenario = 'HighScenario'
-        case 'LowScenario':
-            entry_scenario = 'LowScenario'
-        case 'BaseScenario':
-            entry_scenario = 'BaseScenario'
-        case 'HighScenario':
-            entry_scenario = 'HighScenario'
-        case _:
-            raise ScenarioError(scenario)
-    return entry_scenario
+    try:
+        return dict_scenario[scenario]
+    except KeyError:
+        raise ScenarioError(scenario)
 
 
 # Cost scenario based on Aircraft Operator Low-Cost Carrier (LCC)

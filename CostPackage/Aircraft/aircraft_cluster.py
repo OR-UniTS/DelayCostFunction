@@ -17,7 +17,7 @@ aircraft_cluster_dict = dict(zip(aircraft_cluster.AircraftType, aircraft_cluster
 
 # NOTE: Aircraft types are identified by their ICAO codes
 def get_aircraft_cluster(aircraft_type: str):
-    if aircraft_type in list(aircraft_cluster_dict.keys()):
+    try:
         return aircraft_cluster_dict[aircraft_type]
-    else:
+    except KeyError:
         raise AircraftClusterError(aircraft_type)

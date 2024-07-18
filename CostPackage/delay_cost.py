@@ -2,6 +2,8 @@ from CostPackage.Curfew.curfew_costs import check_valid_curfew_costs
 from CostPackage.TacticalDelayCosts import *
 from CostPackage.cost_object import CostObject
 
+from CostPackage.utilities import clock_time
+
 
 def get_delay_cost(aircraft_type: str,
                    passengers: int | str = None,
@@ -74,7 +76,7 @@ def get_delay_cost(aircraft_type: str,
     regular_passengers = 0
     aircraft_cluster = None
     crew_costs_function = zero_costs()
-    maintenance_cost_fucntion = zero_costs()
+    maintenance_cost_function = zero_costs()
     total_fuel_costs = zero_costs()
     curfew_costs = zero_costs()
     passengers_hard_costs = zero_costs()
@@ -92,114 +94,119 @@ def get_delay_cost(aircraft_type: str,
             return "Conflict between exact value and scenario for: " + self.conflict_type + " Cannot both be non None"
 
     try:
-        aircraft_cluster = get_aircraft_cluster(aircraft_type)
+        with clock_time(message_after='hit 1'):
+            aircraft_cluster = get_aircraft_cluster(aircraft_type)
 
-        # to calculate passengers hard costs, haul determined according to flight length is needed
-        # if flight_length is None a default value could be used to have a Medium Haul e.g. flight_length=2000
-        # this could be valid only AT GATE, default flight_length value could disrupt fuel costs in EN ROUTE phase
-        # if flight_length is None:
-        #   haul = get_haul(fixed_flight_length)
+            # to calculate passengers hard costs, haul determined according to flight length is needed
+            # if flight_length is None a default value could be used to have a Medium Haul e.g. flight_length=2000
+            # this could be valid only AT GATE, default flight_length value could disrupt fuel costs in EN ROUTE phase
+            # if flight_length is None:
+            #   haul = get_haul(fixed_flight_length)
 
-        if flight_length is not None:
-            haul = get_haul(flight_length)
+            if flight_length is not None:
+                haul = get_haul(flight_length)
 
-        if (destination_airport is not None) and (
-                is_valid_airport_icao(airport_icao=destination_airport.strip().upper())):
-            destination_airport = destination_airport
+            if (destination_airport is not None) and (
+                    is_valid_airport_icao(airport_icao=destination_airport.strip().upper())):
+                destination_airport = destination_airport
 
             # If airline is LCC sets all costs scenario to low,
             # elif destination airport is in group 1 airports (more than 25 million passengers) set scenario to high
             # else scenario default is base
-        if is_low_cost_airline is not None or destination_airport is not None:
-            scenario = get_fixed_cost_scenario(is_low_cost_airline=is_low_cost_airline,
-                                               destination_airport_ICAO=destination_airport)
-            passenger_scenario = scenario if passengers is None or type(passengers) is int else passengers
 
-        # without passengers number input inserted use passengers load factor based on scenario either inserted by user
-        # or indirectly obtained by previous if statement
-        if passengers is None:
-            if type(passengers) is str:
-                passenger_scenario = passengers
+            if is_low_cost_airline is not None or destination_airport is not None:
+                scenario = get_fixed_cost_scenario(is_low_cost_airline=is_low_cost_airline,
+                                                   destination_airport_ICAO=destination_airport)
+                passenger_scenario = scenario if passengers is None or type(passengers) is int else passengers
+
+            # without passengers number input inserted use passengers load factor based on scenario either inserted by user
+            # or indirectly obtained by previous if statement
+            if passengers is None:
+                if type(passengers) is str:
+                    passenger_scenario = passengers
+                else:
+                    passenger_scenario = scenario
+
+                passengers_number = get_passengers(aircraft_type=aircraft_cluster, scenario=passenger_scenario)
             else:
-                passenger_scenario = scenario
-            passengers_number = get_passengers(aircraft_type=aircraft_cluster, scenario=passenger_scenario)
-        else:
-            passengers_number = passengers
+                passengers_number = passengers
 
-        number_missed_connection_passengers = 0 if missed_connection_passengers is None else len(
-            missed_connection_passengers)
-
-        regular_passengers = passengers_number - number_missed_connection_passengers
-
-        # CREW COSTS
-        # NO crew costs input, either manage as zero costs or choose a default scenario
-        if crew_costs is None:
-            # crew_costs_function = zero_costs()
-            crew_costs_function = get_crew_costs(aircraft_cluster=aircraft_cluster, scenario=scenario)
-        # Crew costs based on exact value
-        elif type(crew_costs) is float:
-            crew_costs_function = get_crew_costs_from_exact_value(crew_costs)
-        # Crew cost estimation based on scenario
-        elif type(crew_costs) is str:
-            crew_costs_function = get_crew_costs(aircraft_cluster=aircraft_cluster, scenario=crew_costs)
-        else:
-            raise FunctionInputParametersError("CREW")
-
-        # MAINTENANCE COSTS
-        # NO maintenance costs input,  either manage as zero costs or choose a default scenario
-        if maintenance_costs is None:
-            # maintenance_cost_fucntion = zero_costs()
-            maintenance_cost_fucntion = get_maintenance_costs(aircraft_cluster=aircraft_cluster,
-                                                            scenario=scenario, flight_phase=flight_phase)
-        # Maintenance costs based on exact value
-        elif type(maintenance_costs) is float:
-            maintenance_cost_fucntion = get_maintenance_costs_from_exact_value(maintenance_costs)
-        # Maintenance costs based on scenario
-        elif type(maintenance_costs) is str:
-            maintenance_cost_fucntion = get_maintenance_costs(aircraft_cluster=aircraft_cluster,
-                                                            scenario=maintenance_costs, flight_phase=flight_phase)
-        else:
-            raise FunctionInputParametersError("MAINTENANCE")
-
-        # CURFEW COSTS
-        if curfew is None:
-            curfew_costs = zero_costs()
-        elif type(curfew) is tuple or type(curfew) in [float, int]:
-            curfew_threshold = curfew[0] if type(curfew) is tuple else curfew
-            curfew_passengers = curfew[
-                1] if type(curfew) is tuple else regular_passengers + number_missed_connection_passengers
-            curfew_cost_value = get_curfew_costs(aircraft_cluster=aircraft_cluster, curfew_passengers=curfew_passengers)
-            curfew_costs = lambda d: curfew_cost_value if d > curfew_threshold else 0
-
-        else:  # Both parameters are not None, situation managed as a conflict
-            raise FunctionInputParametersError("CURFEW")
-
-        # PASSENGER COSTS
-        # Soft and Hard costs of passengers who didn't lose the connection
-        passengers_hard_costs = get_hard_costs(passengers=regular_passengers, scenario=passenger_scenario, haul=haul)
-        passengers_soft_costs = get_soft_costs(passengers=regular_passengers, scenario=passenger_scenario)
-
-        # Soft and Hard costs of passengers with missed connection
-        if number_missed_connection_passengers > 0:
-            # Hard and soft costs for a single passenger
-            missed_connection_passengers_hard_costs = get_hard_costs(passengers=1, scenario=passenger_scenario,
-                                                                     haul=haul)
-            missed_connection_passengers_soft_costs = get_soft_costs(passengers=1, scenario=passenger_scenario)
-
-            def considered_passenger_costs(delay, passenger, cost_type):
-                # Set only care if delay is less than passenger connection threshold
-                # Set 0 if delay < passenger connection threshold
-                considered_passengers_cost_function = missed_connection_passengers_hard_costs if cost_type == 'hard' \
-                    else missed_connection_passengers_soft_costs
-                return considered_passengers_cost_function(delay if delay < passenger[0] else passenger[1])
-
-            passengers_costs = lambda delay: passengers_hard_costs(delay) + passengers_soft_costs(delay) + sum(
-                considered_passenger_costs(delay, passenger, 'hard') for passenger in
-                missed_connection_passengers) + sum(
-                considered_passenger_costs(delay, passenger, 'soft') for passenger in
+            number_missed_connection_passengers = 0 if missed_connection_passengers is None else len(
                 missed_connection_passengers)
-        else:
-            passengers_costs = lambda delay: passengers_hard_costs(delay) + passengers_soft_costs(delay)
+
+            regular_passengers = passengers_number - number_missed_connection_passengers
+
+        with clock_time(message_after='hit 2'):
+            # CREW COSTS
+            # NO crew costs input, either manage as zero costs or choose a default scenario
+            if crew_costs is None:
+                crew_costs_function = get_crew_costs(aircraft_cluster=aircraft_cluster, scenario=scenario)
+            # Crew costs based on exact value
+            elif type(crew_costs) is float:
+                crew_costs_function = get_crew_costs_from_exact_value(crew_costs)
+            # Crew cost estimation based on scenario
+            elif type(crew_costs) is str:
+                crew_costs_function = get_crew_costs(aircraft_cluster=aircraft_cluster, scenario=crew_costs)
+            else:
+                raise FunctionInputParametersError("CREW")
+
+        with clock_time(message_after='hit 3'):
+            # MAINTENANCE COSTS
+            # NO maintenance costs input,  either manage as zero costs or choose a default scenario
+            if maintenance_costs is None:
+                maintenance_cost_function = get_maintenance_costs(aircraft_cluster=aircraft_cluster,
+                                                                scenario=scenario, flight_phase=flight_phase)
+            # Maintenance costs based on exact value
+            elif type(maintenance_costs) is float:
+                maintenance_cost_function = get_maintenance_costs_from_exact_value(maintenance_costs)
+            # Maintenance costs based on scenario
+            elif type(maintenance_costs) is str:
+                maintenance_cost_function = get_maintenance_costs(aircraft_cluster=aircraft_cluster,
+                                                                scenario=maintenance_costs, flight_phase=flight_phase)
+            else:
+                raise FunctionInputParametersError("MAINTENANCE")
+
+        with clock_time(message_after='hit 4'):
+            # CURFEW COSTS
+            if curfew is None:
+                curfew_costs = zero_costs()
+            elif type(curfew) is tuple or type(curfew) in [float, int]:
+                curfew_threshold = curfew[0] if type(curfew) is tuple else curfew
+                curfew_passengers = curfew[
+                1] if type(curfew) is tuple else regular_passengers + number_missed_connection_passengers
+                curfew_cost_value = get_curfew_costs(aircraft_cluster=aircraft_cluster, curfew_passengers=curfew_passengers)
+                curfew_costs = lambda d: curfew_cost_value if d > curfew_threshold else 0
+
+            else:  # Both parameters are not None, situation managed as a conflict
+                raise FunctionInputParametersError("CURFEW")
+
+            # PASSENGER COSTS
+            # Soft and Hard costs of passengers who didn't lose the connection
+            passengers_hard_costs = get_hard_costs(passengers=regular_passengers, scenario=passenger_scenario, haul=haul)
+            passengers_soft_costs = get_soft_costs(passengers=regular_passengers, scenario=passenger_scenario)
+
+        with clock_time(message_after='hit 5'):
+            # Soft and Hard costs of passengers with missed connection
+            if number_missed_connection_passengers > 0:
+                # Hard and soft costs for a single passenger
+                missed_connection_passengers_hard_costs = get_hard_costs(passengers=1, scenario=passenger_scenario,
+                                                                         haul=haul)
+                missed_connection_passengers_soft_costs = get_soft_costs(passengers=1, scenario=passenger_scenario)
+
+                def considered_passenger_costs(delay, passenger, cost_type):
+                    # Set only care if delay is less than passenger connection threshold
+                    # Set 0 if delay < passenger connection threshold
+                    considered_passengers_cost_function = missed_connection_passengers_hard_costs if cost_type == 'hard' \
+                        else missed_connection_passengers_soft_costs
+                    return considered_passengers_cost_function(delay if delay < passenger[0] else passenger[1])
+
+                passengers_costs = lambda delay: passengers_hard_costs(delay) + passengers_soft_costs(delay) + sum(
+                    considered_passenger_costs(delay, passenger, 'hard') for passenger in
+                    missed_connection_passengers) + sum(
+                    considered_passenger_costs(delay, passenger, 'soft') for passenger in
+                    missed_connection_passengers)
+            else:
+                passengers_costs = lambda delay: passengers_hard_costs(delay) + passengers_soft_costs(delay)
 
     except AircraftClusterError as aircraft_cluster_error:
         print(aircraft_cluster_error.message)
@@ -232,7 +239,7 @@ def get_delay_cost(aircraft_type: str,
         print(print(f"An unexpected exception occurred: {e}"))
 
     finally:
-        cost_function = lambda delay: (maintenance_cost_fucntion(delay) + crew_costs_function(delay)
+        cost_function = lambda delay: (maintenance_cost_function(delay) + crew_costs_function(delay)
                                        + passengers_costs(delay) + curfew_costs(delay))
 
         cost_object = CostObject(cost_function, aircraft_type,
@@ -240,7 +247,7 @@ def get_delay_cost(aircraft_type: str,
                                  missed_connection_passengers,
                                  curfew, aircraft_cluster, flight_phase, haul, scenario, passenger_scenario,
                                  regular_passengers, passengers_number,
-                                 crew_costs_function, maintenance_cost_fucntion, total_fuel_costs, curfew_costs,
+                                 crew_costs_function, maintenance_cost_function, total_fuel_costs, curfew_costs,
                                  passengers_hard_costs, passengers_soft_costs)
 
         return cost_object
