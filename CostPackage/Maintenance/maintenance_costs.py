@@ -4,7 +4,6 @@ import pandas as pd
 
 from CostPackage.FlightPhase.flight_phase import get_flight_phase, FlightPhaseError
 from CostPackage.Scenario.scenario import get_scenario, ScenarioError
-from CostPackage.utilities import clock_time
 
 # Costs are expressed in EUR/min for three different scenarios low,base and high
 # see Table 6 at page 14/39 of following document
@@ -39,11 +38,8 @@ def get_maintenance_costs(aircraft_cluster: str, scenario: str, flight_phase: st
             maintenance_cost = df_maintenance_taxi[aircraft_cluster][entry_scenario]
         else:  # EN_ROUTE
             maintenance_cost = dict_maintenance_en_route[aircraft_cluster][entry_scenario]
-        def f(delay):
-            with clock_time(message_after='maintenance cost executed in'):
-                return maintenance_cost * delay
-        return f
-        # return lambda delay: maintenance_cost * delay
+
+        return lambda delay: maintenance_cost * delay
 
     except ScenarioError as scenario_error:
         print(scenario_error.message)

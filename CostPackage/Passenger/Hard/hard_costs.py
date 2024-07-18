@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 from typing import Callable
 
-from CostPackage.utilities import clock_time
 
 # Costs are expressed in EUR
 # see Tables 13 and 14 at page 21/39 of following document
@@ -57,10 +56,7 @@ def get_hard_costs(passengers: int, scenario: str, haul: str) -> Callable:
     reimbursement_passenger_costs = dict_reimbursement_passenger_costs[haul]
     total_passenger_costs = (waiting_passengers * waiting_passenger_costs + reimbursement_passengers
                              * reimbursement_passenger_costs)
+
     delays = np.array([120, 180, 240, 300, 600])
 
-    def f(delay):
-        with clock_time(message_after='hard cost executed in'):
-            return get_interval(delay, total_passenger_costs, delays)
-    return f
-    # return lambda delay: get_interval(delay, total_passenger_costs, delays)
+    return lambda delay: get_interval(delay, total_passenger_costs, delays)

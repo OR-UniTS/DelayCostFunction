@@ -2,7 +2,6 @@ import os
 from typing import Callable
 import pandas as pd
 from CostPackage.Scenario.scenario import get_scenario
-from CostPackage.utilities import clock_time
 
 # Costs are expressed in EUR/min for three different scenarios low,base and high
 # low scenario costs are set to zero by default
@@ -17,12 +16,7 @@ def get_crew_costs(aircraft_cluster: str, scenario: str) -> Callable:
     entry_scenario = get_scenario(scenario)
     crew_cost = dict_crew[aircraft_cluster][entry_scenario]
 
-    def f(delay):
-        with clock_time(message_after='crew cost executed in'):
-            return crew_cost * delay
-
-    return f
-    # return lambda delay: crew_cost * delay
+    return lambda delay: crew_cost * delay
 
 
 # Crew costs in EUR/min provided directly by user without scenario

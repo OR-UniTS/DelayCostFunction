@@ -3,8 +3,6 @@ from typing import Callable
 import pandas as pd
 import numpy as np
 
-from CostPackage.Scenario.scenario import get_scenario
-from CostPackage.utilities import clock_time
 
 # ATTENTION: as mentioned in the following document
 # https://www.beacon-sesar.eu/wp-content/uploads/2022/10/893100-BEACON-D3.2-Industry-briefing-on-updates-to-the-European-cost-of-delay-V.01.01.00-1.pdf
@@ -40,8 +38,5 @@ def get_soft_costs(passengers: int, scenario: str) -> Callable:
     # see also page 64/110 of Annex D of the same document mentioned above where the use
     # of only 10% of total soft costs is mentioned
     discount_factor = 0.1
-    def f(delay):
-        with clock_time(message_after='soft cost executed in'):
-            return get_interpolated_value(delay, costs) * passengers * delay * discount_factor
-    return f
-    #return lambda delay: get_interpolated_value(delay, costs, delays) * passengers * delay * discount_factor
+
+    return lambda delay: get_interpolated_value(delay, costs) * passengers * delay * discount_factor
