@@ -19,12 +19,14 @@ dict_hard = {haul: df_hard[[haul, 'CostType']].set_index('CostType')[haul] for h
 
 df_waiting_passenger_costs = df_hard[['ShortHaul', 'MediumHaul', 'LongHaul']] * df_hard_waiting_rate[['ShortHaul', 'MediumHaul', 'LongHaul']]
 df_waiting_passenger_costs['CostType'] = df_hard['CostType']
-dict_waiting_passenger_costs = {haul: df_waiting_passenger_costs[haul].sum() for haul in ['ShortHaul', 'MediumHaul', 'LongHaul']}
+df_waiting_passenger_costs['Delay'] = df_hard['Delay']
+dict_waiting_passenger_costs = {haul: df_waiting_passenger_costs[[haul, 'Delay']].groupby('Delay').sum()[haul].to_numpy() for haul in ['ShortHaul', 'MediumHaul', 'LongHaul']}
 
 
 df_reimbursement_passenger_costs = df_hard[['ShortHaul', 'MediumHaul', 'LongHaul']] * df_hard_reimbursement_rate[['ShortHaul', 'MediumHaul', 'LongHaul']]
 df_reimbursement_passenger_costs['CostType'] = df_hard['CostType']
-dict_reimbursement_passenger_costs = {haul: df_reimbursement_passenger_costs[haul].sum() for haul in ['ShortHaul', 'MediumHaul', 'LongHaul']}
+df_reimbursement_passenger_costs['Delay'] = df_hard['Delay']
+dict_reimbursement_passenger_costs = {haul: df_reimbursement_passenger_costs[[haul, 'Delay']].groupby('Delay').sum()[haul].to_numpy() for haul in ['ShortHaul', 'MediumHaul', 'LongHaul']}
 
 # from The cost of passenger delay to airlines in Europe, consultation document, UOW 2015
 # confirmed in deliverable D3.2 Industry  briefing  on updates  to  the  European cost of delay, Beacon Project, 2019
@@ -51,7 +53,6 @@ def get_hard_costs(passengers: int, scenario: str, haul: str) -> Callable:
                                        else WAITING_RATE)
     reimbursement_passengers = passengers * (REIMBURSEMENT_RATE_LOW_COST if scenario == "LowScenario"
                                              else REIMBURSEMENT_RATE)
-    passenger_care_support_list = ["care", "reimbursement_rebooking", "compensation", "accommodation"]
     waiting_passenger_costs = dict_waiting_passenger_costs[haul]
     reimbursement_passenger_costs = dict_reimbursement_passenger_costs[haul]
     total_passenger_costs = (waiting_passengers * waiting_passenger_costs + reimbursement_passengers
